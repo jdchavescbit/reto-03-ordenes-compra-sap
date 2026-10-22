@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agente de Órdenes de Compra SAP · Perxia 2.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Header -->
+    <header class="topbar">
+      <div class="topbar-brand">
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title-row">
+            <h1 class="brand-title">Agente Órdenes de Compra SAP</h1>
+            <span class="brand-badge">SAP MM · ME21N</span>
+          </div>
+          <p class="brand-subtitle">Periferia IT Group · Automatización y Control Previo de Compras</p>
+        </div>
+      </div>
+
+      <div class="topbar-status">
+        <div class="health-pill" id="health-pill" title="Estado del motor del agente">
+          <span class="status-dot" id="health-dot"></span>
+          <span id="health-text">Conectando...</span>
+        </div>
+
+        <div class="session-pill" title="Identificador de sesión activa">
+          <span class="session-label">Sesión:</span>
+          <code id="session-id-display">--</code>
+        </div>
+
+        <button class="btn btn-secondary btn-sm" id="btn-audit-drawer" type="button" title="Ver Log de Control y Órdenes SAP">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          <span>Auditoría SAP</span>
+          <span class="counter-badge" id="audit-count-badge">0</span>
+        </button>
+
+        <button class="btn btn-secondary btn-sm" id="btn-reset-session" type="button" title="Iniciar sesión limpia">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"/>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          <span>Nueva Sesión</span>
+        </button>
+
+        <button class="btn btn-icon" id="btn-theme-toggle" type="button" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema">
+          <svg id="icon-theme" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="workspace">
+      <!-- Left Sidebar: Cases & Quick Actions -->
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <div class="section-header">
+            <h2 class="section-title">Prompt Oficial de Demo</h2>
+            <span class="tag tag-accent">Sección 11 PRD</span>
+          </div>
+          <p class="section-desc">
+            Ejecuta el flujo de validación con discrepancia de cotización y espera de confirmación humana explícita.
+          </p>
+          <button class="btn btn-primary btn-block" id="btn-official-demo" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            <span>Probar Caso Demo (sol-004)</span>
+          </button>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section sidebar-cases-section">
+          <div class="section-header">
+            <h2 class="section-title">Solicitudes en Bandeja</h2>
+            <span class="tag" id="cases-total-tag">6 casos</span>
+          </div>
+          <p class="section-desc">Haz clic en cualquier paquete para que el agente lo inspeccione, valide contra maestros y prepare la OC:</p>
+
+          <div class="cases-list" id="cases-list">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+          <div class="section-header">
+            <h2 class="section-title">Reglas de Control Activas</h2>
+            <span class="tag">RC1–RC10</span>
+          </div>
+          <ul class="rules-summary">
+            <li><span class="rule-dot rule-block"></span><strong>Bloqueos (RC1–RC4, RC10):</strong> Proveedor activo, aprobador autorizado, tope centro costo, subárea válida, aritmética.</li>
+            <li><span class="rule-dot rule-confirm"></span><strong>Confirmación (RC5, RC6, RC8, RC9):</strong> Desvío cotización &gt;2%, IVA derivado, OC retroactiva, fecha aprobación.</li>
+            <li><span class="rule-dot rule-derived"></span><strong>Derivados (RC6, RC7):</strong> Condición de pago e indicador IVA desde maestro de proveedores.</li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Center: Chat & Tool Call Inspector -->
+      <main class="chat-panel">
+        <!-- Messages Stream -->
+        <div class="chat-messages" id="chat-messages" role="log" aria-live="polite">
+          <!-- Welcome Card injected by app.js -->
+        </div>
+
+        <!-- Thinking / Tool Execution Indicator -->
+        <div class="thinking-bar hidden" id="thinking-bar">
+          <div class="spinner"></div>
+          <div class="thinking-info">
+            <span class="thinking-title">Agente ejecutando ciclo y herramientas SAP...</span>
+            <span class="thinking-sub" id="thinking-sub">Consultando paquetes, maestros y reglas RC1–RC10</span>
+          </div>
+        </div>
+
+        <!-- Confirmation Alert Banner (CA3 - Highlighted when needsConfirmation = true) -->
+        <div class="confirmation-banner hidden" id="confirmation-banner" role="alert">
+          <div class="confirmation-banner-content">
+            <div class="confirmation-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+            <div class="confirmation-text">
+              <div class="confirmation-title">Confirmación Humana Requerida (Regla CA3)</div>
+              <p class="confirmation-desc">
+                El agente detectó excepciones de tipo <strong>Confirmación</strong> (ej. diferencia en cotización, IVA derivado o factura retroactiva) o espera tu visto bueno antes de registrar la Orden de Compra en SAP.
+              </p>
+            </div>
+          </div>
+          <div class="confirmation-actions">
+            <button class="btn btn-confirm" id="btn-confirm-yes" type="button">
+              ✓ Confirmar y crear OC en SAP
+            </button>
+            <button class="btn btn-reject" id="btn-confirm-no" type="button">
+              ✕ Cancelar / Rechazar creación
+            </button>
+          </div>
+        </div>
+
+        <!-- Composer -->
+        <form class="chat-composer" id="chat-form">
+          <div class="composer-input-wrap">
+            <textarea
+              id="chat-input"
+              rows="2"
+              placeholder="Escribe una instrucción para el agente (ej. «Procesa la solicitud sol-004» o «Confirmo, crea la OC»)..."
+              aria-label="Mensaje para el agente"
+            ></textarea>
+            <div class="composer-actions">
+              <span class="composer-hint">Enter para enviar · Shift+Enter nueva línea</span>
+              <button class="btn btn-primary" id="btn-send" type="submit">
+                <span>Enviar</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"/>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </form>
+      </main>
+
+      <!-- Right / Collapsible Drawer: Live SAP Audit & Control Log -->
+      <aside class="audit-drawer hidden" id="audit-drawer" aria-label="Panel de Auditoría SAP y Log de Control">
+        <div class="drawer-header">
+          <div>
+            <h2 class="drawer-title">Auditoría SAP &amp; Control</h2>
+            <p class="drawer-subtitle">Datos en tiempo real de <code>out/control.csv</code> y <code>out/sap/ordenes.jsonl</code></p>
+          </div>
+          <div class="drawer-header-actions">
+            <button class="btn btn-secondary btn-sm" id="btn-refresh-audit" type="button" title="Actualizar datos">
+              ↻ Actualizar
+            </button>
+            <button class="btn btn-icon" id="btn-close-audit" type="button" title="Cerrar panel">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div class="drawer-body">
+          <!-- KPI Summary Cards -->
+          <div class="audit-kpis">
+            <div class="kpi-card">
+              <span class="kpi-label">Órdenes SAP Creadas</span>
+              <strong class="kpi-value" id="kpi-ordenes">0</strong>
+            </div>
+            <div class="kpi-card kpi-warn">
+              <span class="kpi-label">OC Retroactivas</span>
+              <strong class="kpi-value" id="kpi-retroactivas">0</strong>
+            </div>
+            <div class="kpi-card kpi-danger">
+              <span class="kpi-label">Intentos Bloqueados</span>
+              <strong class="kpi-value" id="kpi-bloqueados">0</strong>
+            </div>
+          </div>
+
+          <!-- SAP Orders Created -->
+          <div class="drawer-section">
+            <h3 class="drawer-section-title">Órdenes Registradas en SAP (<code>out/sap/ordenes.jsonl</code>)</h3>
+            <div id="sap-orders-container" class="audit-table-wrap">
+              <p class="empty-state">Aún no se han creado órdenes en esta ejecución.</p>
+            </div>
+          </div>
+
+          <!-- Control Log CSV -->
+          <div class="drawer-section">
+            <h3 class="drawer-section-title">Registro de Control y Auditoría (<code>out/control.csv</code>)</h3>
+            <div id="control-log-container" class="audit-table-wrap">
+              <p class="empty-state">Sin registros en <code>out/control.csv</code> todavía.</p>
+            </div>
+          </div>
+
+          <!-- Generated Evidence & Traceability Quick Links -->
+          <div class="drawer-section">
+            <h3 class="drawer-section-title">Evidencias y Trazabilidad por Caso (<code>out/&lt;caso&gt;/</code>)</h3>
+            <div class="evidence-links-grid" id="evidence-links-grid">
+              <!-- Populated by app.js -->
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
